@@ -1,0 +1,79 @@
+.container {
+    margin: 3vw;
+}
+
+.card {
+    color: red;
+    position: relative;
+    width: 300px;
+    height: 450px;
+    background: #000;
+    border-radius: 15px;
+}
+
+.card:hover {
+    box-shadow: -1px 0px 53px 0px rgba(255, 0, 0, 0.49);
+    -webkit-box-shadow: -1px 0px 53px 0px rgba(255, 0, 0, 0.49);
+    -moz-box-shadow: -1px 0px 53px 0px rgba(255, 0, 0, 0.49);
+    transition: 0.5s;
+
+}
+
+.face {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.face.back {
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.face.back b {
+    margin: 0;
+    padding: 0;
+}
+
+.face.back .desc {
+    background-color: #ff0000;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.face.front {
+    transition: 0.5s;
+}
+
+.face.front b {
+    margin: 0;
+    padding: 0;
+    font-size: 4em;
+    color: #ffffff;
+    transition: 0.5s;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.card:hover .face.front {
+    height: 60px;
+}
+
+.card:hover .face.front b {
+    font-size: 2em;
+}
+
+.face.front {
+    background: rgba(71, 143, 238, 0.041);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(34, 0, 51, 0.125);
+
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 15px;
+}

@@ -1,0 +1,116 @@
+.navbutton {
+  font-family: 'Playfair Display', serif;
+  padding: 0.744vw 1.7vw;
+
+  border-radius: 15px;
+  background-color: transparent;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: normal;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  border: none;
+}
+
+.navbutton:hover {
+  border: 1px solid red;
+  box-shadow: 0 0 20px #ff000050;
+  transform: scale(1.05);
+}
+
+.navbutton:active {
+  background-color: #ff000080;
+  transition: all 0.5s;
+  -webkit-transition: all 0.25s;
+  box-shadow: none;
+  transform: scale(0.98);
+}
+
+
+
+
+/* LOGO */
+
+/* === removing default button style ===*/
+.logobutton {
+  margin-right: 10vw;
+  height: auto;
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+/* button styling */
+.logobutton {
+  padding: 3px;
+
+  --border-right: 0.357vw;
+  --text-stroke-color: rgba(255, 255, 255, 0.6);
+  --animation-color: #ff0000;
+  --fs-size: 1.905vw;
+  letter-spacing: 0.179vw;
+  text-decoration: none;
+  font-size: var(--fs-size);
+  font-family: 'Kaushan Script', cursive;
+  position: relative;
+  /* text-transform: uppercase; */
+  color: transparent;
+  -webkit-text-stroke: 1px var(--text-stroke-color);
+}
+
+/* this is the text, when you hover on button */
+.hover-text {
+  --text-stroke-color: rgba(255, 255, 255, 0.6);
+  position: absolute;
+  box-sizing: border-box;
+  content: attr(data-text);
+  text-shadow: 0px 3px 27px rgba(255,0,0,0.63);
+  color: var(--animation-color);
+  width: 0%;
+  inset: 0;
+  border-right: var(--border-right) solid rgba(255, 0, 0, 0);
+  overflow: hidden;
+  transition: 0.5s;
+  -webkit-text-stroke: 0.060vw var(--animation-color);
+}
+
+/* hover */
+.logobutton:hover .hover-text {
+  width: 100%;
+  filter: drop-shadow(0 0 1.369vw var(--animation-color))
+}
+
+
+
+/* download button */
+
+
+
+.download-button {
+  color: white;
+  text-decoration: none;
+  font-size: 25px;
+  border: none;
+  background: none;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+
+.download-button::before {
+  margin-left: auto;
+}
+
+.download-button::after,
+.download-button::before {
+  content: '';
+  width: 0%;
+  height: 2px;
+  background: #f44336;
+  display: block;
+  transition: 0.5s;
+}
+
+.download-button:hover::after,
+.download-button:hover::before {
+  width: 100%;
+}

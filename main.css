@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=Alumni+Sans:wght@100&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch&family=Nothing+You+Could+Do&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box !important;
+    scroll-behavior: smooth;
+    /* font-family: 'Arimo', sans-serif; */
+
+}
+
+
+body {
+    background: linear-gradient(135deg, black, #220033);
+}
+
+
+header {
+    position: fixed;
+    top: 0%;
+    z-index: 10000;
+    width: 100vw;
+    padding: 40px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    background: transparent;
+
+}
+
+header.sticky {
+    padding: 25px 0px;
+    background: rgba(71, 143, 238, 0.041);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    -webkit-box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    -moz-box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    transition: all ease-in-out 1.5s;
+}
+
+.logo {
+    color: white;
+    text-decoration: none;
+    margin-right: 10vw;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+}
+
+ul {
+    display: flex;
+}
+
+
+li {
+    list-style: none;
+    margin-right: 2.381vw;
+}
+
+.home {
+
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    /* background: url(/Images/bg1.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: right; */
+}
+.gallery{
+    
+    width: 500px;
+    height: 500px;
+    margin:  0px 0px 0px 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.simg1{
+    filter: opacity(50%);
+    width: 150px;
+    height: 400px;
+    background-color: #220033;
+    background-image: url(/Images/simg1.jpg);
+    background-size: cover;
+    
+    
+}
+.simg2{
+    filter: opacity(50%);
+    background-image: url(/Images/simg2.JPG);
+    background-size: cover;
+    width: 150px;
+    height: 400px;
+    background-color: #220033;
+}
+.limg{
+    background-image: url(/Images/limg.JPG);
+    background-size: cover;
+    filter: opacity(50%);
+    margin:  0px 10px 0px 10px;
+    width: 170px;
+    height: 450px;
+    background-color: #b99ec7;
+    z-index: 2000;
+
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    -webkit-box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    -moz-box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    /* transition: all ease-in-out 1.5s; */
+    
+}
+.simg1:hover{
+    filter: opacity(100%);
+    transition: 1s;
+    background-position: center;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    -webkit-box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    -moz-box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    /* z-index: 4000; */
+    
+}
+.simg2:hover{
+    filter: opacity(100%);
+    transition: 1s;
+    background-position: center;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    -webkit-box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    -moz-box-shadow: 0px 8px 60px -10px rgba(233, 217, 217, 0.56);
+    /* z-index: 4000; */
+    
+}
+.limg:hover{
+    filter: opacity(100%);
+    transition: 1s;
+    transform: scale(1.2);
+    background-position: center;
+}
+
+.text {
+    z-index: -3;
+    color: white;
+    /* position: relative; */
+    padding: 0px 0px 0px 200px;
+}
+
+.text h2 {
+    font-size: 80px;
+    font-family: 'Abril Fatface', serif;
+}
+
+.intext h1 {
+    color: red;
+    font-size: 100px;
+    align-self: last baseline;
+    font-family: 'Roboto', serif;
+}
+
+.intext h1:hover {
+    color: red;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: 1s;
+    transform: scale(1.1);
+    margin: 0px 0px 0px 30px;
+}
+
+
+
+.text p {
+    font-family: 'Abril Fatface', serif;
+    margin: 30px 0px 0px 0px;
+    font-size: 60px;
+}
+
+.intext {
+    display: flex;
+}
+
+.intext p {
+    font-family: 'Abril Fatface', serif;
+    font-family: 'Chakra Petch', sans-serif;
+    font-family: 'Nothing You Could Do', cursive;
+    font-size: 40px;
+    align-self: last baseline;
+    margin: 0px 20px 0px 0px;
+}
+
+
+.about {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: linear-gradient(135deg, #220033, black);
+}
+
+.inabout {
+    width: 90vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.about-text:hover {
+    cursor: default;
+    transform: scale(1.1);
+    transition: all 0.5s;
+}
+
+.about-text {
+    width: 450px;
+    display: flex;
+    flex-direction: column;
+}
+
+.about-text h2 {
+    font-family: 'Roboto', serif;
+    font-size: 60px;
+    color: red;
+    font-weight: bold;
+}
+
+.lin {
+    width: 350px;
+    height: 2px;
+    background-color: red;
+    margin-bottom: 25px;
+}
+
+.reds:hover {
+    cursor: pointer;
+    color: red;
+
+}
+
+.about-text h5 {
+    color: rgb(255, 255, 255);
+    font-size: 30px;
+    font-family: 'Alumni Sans', sans-serif;
+    line-height: 35px;
+
+}
+
+.about-imge img {
+    transition: all 0.5s;
+    width: 350px;
+    margin-right: 10vw;
+}
+
+.about-imge img:hover {
+    filter: drop-shadow(0 0 20px #ff000057);
+    transform: scale(1.2);
+}
+
+.services {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    background: linear-gradient(135deg, black, #220033);
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
