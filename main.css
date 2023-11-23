@@ -91,21 +91,21 @@ li {
     width: 150px;
     height: 400px;
     background-color: #220033;
-    background-image: url(simg1.jpg);
+    background-image: url(/Portfolio/simg1.jpg);
     background-size: cover;
     
     
 }
 .simg2{
     filter: opacity(50%);
-    background-image: url(simg2.JPG);
+    background-image: url(/Portfolio/simg2.JPG);
     background-size: cover;
     width: 150px;
     height: 400px;
     background-color: #220033;
 }
 .limg{
-    background-image: url(limg.JPG);
+    background-image: url(/Portfolio/limg.JPG);
     background-size: cover;
     filter: opacity(50%);
     margin:  0px 10px 0px 10px;
