@@ -33,11 +33,12 @@
 
 /* === removing default button style ===*/
 .logobutton {
-  margin-right: 10vw;
+  margin-right: 75vw;
   height: auto;
   background: transparent;
   padding: 0;
   border: none;
+ 
 }
 
 /* button styling */
@@ -47,7 +48,7 @@
   --border-right: 0.357vw;
   --text-stroke-color: rgba(255, 255, 255, 0.6);
   --animation-color: #ff0000;
-  --fs-size: 1.905vw;
+  --fs-size: 40px;
   letter-spacing: 0.179vw;
   text-decoration: none;
   font-size: var(--fs-size);
@@ -113,4 +114,14 @@
 .download-button:hover::after,
 .download-button:hover::before {
   width: 100%;
+}
+
+@media screen and (max-width: 480px) {
+
+.logobutton {
+  --fs-size: 30px;
+}
+.logobutton {
+  margin-right: 70vw;
+}
 }

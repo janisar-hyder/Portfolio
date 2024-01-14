@@ -1,0 +1,274 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito&display=swap");
+
+/***********************/
+/* RESET CSS */
+/***********************/
+
+
+
+a:link,
+a:visited {
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.3s;
+}
+
+/* HELPER CLASSES */
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/***********************/
+/* NAVIGATION MENU */
+/***********************/
+
+/* OVERLAY */
+.overlay {
+    z-index: 20000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.overlay-slide-right {
+    transition: all 0.4s ease-in-out;
+    transform: translateX(0);
+}
+
+.overlay-slide-left {
+    transition: all 0.8s ease-in-out;
+    transform: translateX(-100%);
+}
+
+/* NAV MENU ITEMS */
+nav ul {
+    height: 100vh;
+    height: 100svh;
+    list-style: none;
+}
+
+nav ul li {
+    height: 20%;
+}
+
+nav li:nth-of-type(1) {
+    background: rgba(255, 0, 0, 0.041);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+nav li:nth-of-type(2) {
+    background: rgba(255, 153, 0, 0.041);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+nav li:nth-of-type(3) {
+    background: rgba(255, 196, 0, 0.041);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+nav li:nth-of-type(4) {
+    background: rgba(0, 255, 64, 0.041);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+nav li:nth-of-type(5) {
+    background: rgba(0, 255, 242, 0.041);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+nav li a {
+    letter-spacing: 0.4rem;
+    font-size: 2rem;
+    font-family: 'Abril Fatface', serif;
+}
+
+nav li a:hover,
+nav li a:active {
+    transform: scale(1.2);
+    text-decoration: underline;
+}
+
+/***********************/
+/* NAV SLIDE IN ANIMATION */
+/***********************/
+
+.slide-in-1 {
+    animation: slide-in 0.4s linear 0.2s both;
+}
+
+.slide-in-2 {
+    animation: slide-in 0.4s linear 0.4s both;
+}
+
+.slide-in-3 {
+    animation: slide-in 0.4s linear 0.6s both;
+}
+
+.slide-in-4 {
+    animation: slide-in 0.4s linear 0.8s both;
+}
+
+.slide-in-5 {
+    animation: slide-in 0.4s linear 1s both;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+/***********************/
+/* NAV SLIDE OUT ANIMATION */
+/***********************/
+
+.slide-out-1 {
+    animation: slide-out 0.3s linear 0.5s both;
+}
+
+.slide-out-2 {
+    animation: slide-out 0.3s linear 0.4s both;
+}
+
+.slide-out-3 {
+    animation: slide-out 0.3s linear 0.3s both;
+}
+
+.slide-out-4 {
+    animation: slide-out 0.3s linear 0.2s both;
+}
+
+.slide-out-5 {
+    animation: slide-out 0.3s linear 0.1s both;
+}
+
+@keyframes slide-out {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/***********************/
+/* HAMBURGER MENU ANIMATION */
+/***********************/
+
+.hamburger-menu {
+    margin-left: 85vw;
+    /* position: fixed; */
+    top: 1rem;
+    right: 2rem;
+    z-index: 20000;
+    cursor: pointer;
+}
+
+.menu-bar1,
+.menu-bar2,
+.menu-bar3 {
+    width: 3.5rem;
+    height: 0.2rem;
+    background-color: #fff;
+    margin: 0.8rem 0;
+    transition: 0.4s;
+}
+
+.menu-bar2 {
+    width: 2rem;
+    margin-left: auto;
+}
+
+/* ROTATE FIRST BAR */
+.active .menu-bar1 {
+    transform: rotate(-45deg) translate(-0.7rem, 0.8rem);
+    background-color: red;
+}
+
+/* FADE OUT SECOND BAR */
+.active .menu-bar2 {
+    opacity: 0;
+}
+
+/* ROTATE LAST BAR */
+.active .menu-bar3 {
+    transform: rotate(45deg) translate(-0.6rem, -0.8rem);
+    background-color: red;
+}
+
+
+
+
+
+/**************************/
+/* MEDIA QUERY */
+/**************************/
+
+/* BELOW 832px (Tablets) */
+@media (max-width: 52em) {
+    html {
+        /* 8px / 16px = 0.5 = 50% */
+        font-size: 90%;
+    }
+
+    .simg1{
+        width: 8vw;
+        height: 35vh;
+    }
+    .simg2{  
+        width: 8vw;
+        height: 35vh;
+    }
+    .limg{
+        width: 10vw;
+        height: 53vh;
+    }
+}
+
+/* BELOW 600px (Phones) */
+@media (max-width: 37em) {
+    .hamburger-menu {
+        margin-right: 8vw;
+    }
+
+    .logo {
+        margin-left: 5vw;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+}
+
+
+
+@media screen and (max-width: 400px) {
+    .menu-bar1,
+    .menu-bar2,
+    .menu-bar3 {
+      width: 3rem;
+      height: 0.2rem;
+    
+    }
+    .menu-bar2 {
+      width: 1.5rem;
+    }
+    
+    }
