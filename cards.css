@@ -1,79 +1,115 @@
-.container {
-    margin: 3vw;
-}
+
 
 .card {
-    color: red;
-    position: relative;
-    width: 300px;
-    height: 450px;
-    background: #000;
-    border-radius: 15px;
+  margin: 50px 50px 50px 0px;
+  max-width: 35ch;
+  padding: clamp(1.5rem, 20vh, 10rem) 0 0;
+  background-size: cover;
+  color: rgb(255, 255, 255);
+  box-shadow: 0 1em 2em rgb(0 0 0 / 0.2);
+  transition: transform ease 250ms;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
-
+.imeg1{
+  background-image: url(https://www.thetechbizz.com/wp-content/uploads/2022/08/website-development-process-1.jpg);
+  background-repeat: no-repeat;
+  background-position: 52%;
+  background-size: fill;
+}
+.imeg2{
+  /* background-image: url(https://www.hostinger.com/tutorials/wp-content/uploads/sites/2/2023/06/Website-Development-alt-1.webp); */
+  background-image: url(https://t4.ftcdn.net/jpg/02/46/62/87/360_F_246628725_HO5rjCq9v1ETJ7xty0IZ8J95nuRIOltW.jpg);
+  background-repeat: no-repeat;
+  
+  background-position: 20%;
+  background-size: fill;
+}
+.imeg3{
+  background-image: url(https://www.unite.ai/wp-content/uploads/2023/05/AI-Graphic-design-tools.png);
+  background-position: 45%;
+  background-size: fill;
+}
 .card:hover {
-    box-shadow: -1px 0px 53px 0px rgba(255, 0, 0, 0.49);
-    -webkit-box-shadow: -1px 0px 53px 0px rgba(255, 0, 0, 0.49);
-    -moz-box-shadow: -1px 0px 53px 0px rgba(255, 0, 0, 0.49);
-    transition: 0.5s;
-
+  transform: scale(1.05);
+  background-blend-mode: darken;
 }
 
-.face {
+.card-body {
+    
+  padding: 1.5rem;
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.007),
+    rgba(0, 0, 0, 0.616) 15%,
+    rgb(0 0 0 / 1)
+  );
+}
+
+.card-body p {
+  color: hsl(0, 0%, 100%);
+  margin: 1.9em 0 1.25em 0;
+}
+
+@media (hover: hover), (prefers-reduced-motion: no-preference) {
+  .card-body {
+    transform: translateY(60%);
+    transition: transform 500ms ease;
+  }
+
+  .card:hover .card-body {
+    transform: translateY(0);
+    transition-delay: 500ms;
+  }
+
+  .card-body > *:not(.card-title) {
+    opacity: 0;
+    transition: opacity 1200ms linear 400ms;
+  }
+
+  .card:hover .card-body > *:not(.card-title) {
+    opacity: 1;
+  }
+
+  .card-title::after {
+    content: "";
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    left: -1.5rem;
+    top: 100%;
+    height: 3px;
+    width: calc(100% + 1.5rem);
+    background: hsl(0, 100%, 50%);
+    transform: scaleX(0);
+    transition: transform 1s ease-in-out;
+    transform-origin: left;
+  }
+
+  .card:hover .card-title::after {
+    transition: transform 500ms ease-in-out;
+    transform: scaleX(1);
+  }
 }
 
-.face.back {
-    box-sizing: border-box;
-    padding: 20px;
+.button {
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-block;
+  text-decoration: none;
+  color: black;
+  background: hsl(0, 100%, 50%);
+  padding: 0.5em 1.25em;
+  border-radius: 0.25rem;
 }
 
-.face.back b {
-    margin: 0;
-    padding: 0;
+.button:hover {
+  transition: 0.5s ease-in-out;
+  transform: scale(1.05);
+  color: rgb(255, 255, 255);
+  background: rgb(156, 0, 0);
 }
-
-.face.back .desc {
-    background-color: #ff0000;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.face.front {
-    transition: 0.5s;
-}
-
-.face.front b {
-    margin: 0;
-    padding: 0;
-    font-size: 4em;
-    color: #ffffff;
-    transition: 0.5s;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-}
-
-.card:hover .face.front {
-    height: 60px;
-}
-
-.card:hover .face.front b {
-    font-size: 2em;
-}
-
-.face.front {
-    background: rgba(71, 143, 238, 0.041);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(34, 0, 51, 0.125);
-
-    border: 1px solid rgba(255, 255, 255, 0.075);
-    border-radius: 15px;
+.card-title {
+  
+  position: relative;
+  width: max-content;
 }

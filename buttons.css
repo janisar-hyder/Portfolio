@@ -96,7 +96,10 @@
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
 }
+.download-button:hover{
+cursor: pointer;
 
+}
 .download-button::before {
   margin-left: auto;
 }
@@ -106,7 +109,7 @@
   content: '';
   width: 0%;
   height: 2px;
-  background: #f44336;
+  background: #ff1100;
   display: block;
   transition: 0.5s;
 }

@@ -98,6 +98,7 @@ nav li a:hover,
 nav li a:active {
     transform: scale(1.2);
     text-decoration: underline;
+    color: red;
 }
 
 /***********************/
@@ -189,11 +190,13 @@ nav li a:active {
     background-color: #fff;
     margin: 0.8rem 0;
     transition: 0.4s;
+    border-radius: 0.5rem;
 }
 
 .menu-bar2 {
     width: 2rem;
     margin-left: auto;
+    border-radius: 0.5rem;
 }
 
 /* ROTATE FIRST BAR */

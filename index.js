@@ -109,3 +109,68 @@ document.addEventListener('mouseup', handleMouseUp)
 document.addEventListener('touchstart', handleMouseDown)
 document.addEventListener('touchmove', handleMouseMove)
 document.addEventListener('touchend', handleMouseUp)
+
+// contactForm
+
+
+
+document.getElementById('hireButton').addEventListener('click', function() {
+  var contactForm = document.getElementById('contactForm');
+  contactForm.style.display = (contactForm.style.display === 'block') ? 'none' : 'block';
+});
+
+document.addEventListener('click', function(event) {
+  var contactForm = document.getElementById('contactForm');
+  var hireButton = document.getElementById('hireButton');
+  
+  // Check if the click target is not the contact form or the hire button
+  if (event.target !== contactForm && event.target !== hireButton) {
+    contactForm.style.display = 'none';
+  }
+});
+
+// Stop click event propagation within the form
+document.getElementById('contactForm').addEventListener('click', function(event) {
+  event.stopPropagation();
+});
+
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+  var backButton = document.getElementById("backButton");
+
+  window.onscroll = function() {
+    // Replace "section1" with the ID of your home section
+    var homeSection = document.getElementById("home");
+
+    // Adjust the visibility based on the scroll position
+    if (window.scrollY > 500) {
+      backButton.style.display = "block";
+    } else {
+      backButton.style.display = "none";
+    }
+  };
+});
+
+function goToHome() {
+  // Replace "section1" with the ID of your home section
+  var homeSection = document.getElementById("home");
+
+  // Scroll to the home section
+  homeSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
