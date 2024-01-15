@@ -125,7 +125,7 @@ header.sticky {
   width: 8vw;
   height: 43vh;
   background-color: #220033;
-  background-image: url(/Images/simg1.jpg);
+  background-image: url(/Portfolio/simg1.jpg);
   background-size: cover;
   transition: all ease-in-out 1s;
 
@@ -135,7 +135,7 @@ header.sticky {
 .simg2 {
   border-radius: 0.5rem;
   filter: opacity(50%);
-  background-image: url(/Images/simg2.JPG);
+  background-image: url(/Portfolio/simg2.JPG);
   background-size: cover;
   width: 8vw;
   height: 43vh;
@@ -145,7 +145,7 @@ header.sticky {
 
 .limg {
   border-radius: 0.5rem;
-  background-image: url(/Images/limg.JPG);
+  background-image: url(/Portfolio/limg.JPG);
   background-size: cover;
   filter: opacity(50%);
   margin: 0px 10px 0px 10px;
