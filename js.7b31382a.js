@@ -613,25 +613,36 @@ return ImagesLoaded;
 
 });
 
-},{"ev-emitter":"../node_modules/ev-emitter/ev-emitter.js"}],"js/utils.js":[function(require,module,exports) {
+},{"ev-emitter":"../node_modules/ev-emitter/ev-emitter.js"}],"team/js/utils.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.preloadImages = void 0;
+exports.preloadImages = exports.lerp = exports.getMousePos = void 0;
 const imagesLoaded = require('imagesloaded');
 
 // Preload images
 const preloadImages = function () {
   let selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'img';
   return new Promise(resolve => {
-    imagesLoaded(document.querySelectorAll(selector), {
-      background: true
-    }, resolve);
+    imagesLoaded(document.querySelectorAll(selector), resolve);
   });
 };
+
+// Linear interpolation
 exports.preloadImages = preloadImages;
+const lerp = (a, b, n) => (1 - n) * a + n * b;
+
+// Gets the mouse position
+exports.lerp = lerp;
+const getMousePos = e => {
+  return {
+    x: e.clientX,
+    y: e.clientY
+  };
+};
+exports.getMousePos = getMousePos;
 },{"imagesloaded":"../node_modules/imagesloaded/imagesloaded.js"}],"../node_modules/gsap/gsap-core.js":[function(require,module,exports) {
 "use strict";
 
@@ -6007,174 +6018,984 @@ var _CSSPlugin = require("./CSSPlugin.js");
 var gsapWithCSS = exports.default = exports.gsap = _gsapCore.gsap.registerPlugin(_CSSPlugin.CSSPlugin) || _gsapCore.gsap,
   // to protect from tree shaking
   TweenMaxWithCSS = exports.TweenMax = gsapWithCSS.core.Tween;
-},{"./gsap-core.js":"../node_modules/gsap/gsap-core.js","./CSSPlugin.js":"../node_modules/gsap/CSSPlugin.js"}],"js/index.js":[function(require,module,exports) {
+},{"./gsap-core.js":"../node_modules/gsap/gsap-core.js","./CSSPlugin.js":"../node_modules/gsap/CSSPlugin.js"}],"team/js/panelItem.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PanelItem = void 0;
+class PanelItem {
+  constructor(el) {
+    this.DOM = {
+      el: el
+    };
+    this.DOM.imgWrap = this.DOM.el.querySelector('.panel__item-imgwrap');
+    this.DOM.img = this.DOM.imgWrap.querySelector('img');
+    this.DOM.title = this.DOM.el.querySelector('.panel__item-title');
+    this.DOM.titleTexts = [...this.DOM.title.querySelectorAll('span')];
+    this.DOM.subtitle = this.DOM.el.querySelector('.panel__item-subtitle');
+    // Splitting will run on this
+    this.DOM.subtitleText = this.DOM.subtitle.querySelector('h4');
+    // all subtitle chars 
+    this.DOM.subtitleChars = [...this.DOM.subtitleText.querySelectorAll('.char')];
+    this.DOM.subtitleHeader = this.DOM.subtitle.querySelector('span');
+    this.DOM.closeCtrl = this.DOM.el.querySelector('.panel__item-close');
+  }
+  killActiveTimeline() {
+    if (this.timelineOut) this.timelineOut.kill();
+    if (this.timelineIn) this.timelineIn.kill();
+  }
+}
+exports.PanelItem = PanelItem;
+},{}],"../node_modules/splitting/dist/splitting.css":[function(require,module,exports) {
+
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+},{"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../node_modules/splitting/dist/splitting-cells.css":[function(require,module,exports) {
+
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+},{"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../node_modules/splitting/dist/splitting.js":[function(require,module,exports) {
+var define;
+var global = arguments[3];
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.Splitting = factory());
+}(this, (function () { 'use strict';
+
+var root = document;
+var createText = root.createTextNode.bind(root);
+
+/**
+ * # setProperty
+ * Apply a CSS var
+ * @param {HTMLElement} el
+ * @param {string} varName 
+ * @param {string|number} value 
+ */
+function setProperty(el, varName, value) {
+    el.style.setProperty(varName, value);
+} 
+
+/**
+ * 
+ * @param {!HTMLElement} el 
+ * @param {!HTMLElement} child 
+ */
+function appendChild(el, child) {
+  return el.appendChild(child);
+}
+
+/**
+ * 
+ * @param {!HTMLElement} parent 
+ * @param {string} key 
+ * @param {string} text 
+ * @param {boolean} whitespace 
+ */
+function createElement(parent, key, text, whitespace) {
+  var el = root.createElement('span');
+  key && (el.className = key); 
+  if (text) { 
+      !whitespace && el.setAttribute("data-" + key, text);
+      el.textContent = text; 
+  }
+  return (parent && appendChild(parent, el)) || el;
+}
+
+/**
+ * 
+ * @param {!HTMLElement} el 
+ * @param {string} key 
+ */
+function getData(el, key) {
+  return el.getAttribute("data-" + key)
+}
+
+/**
+ * 
+ * @param {import('../types').Target} e 
+ * @param {!HTMLElement} parent
+ * @returns {!Array<!HTMLElement>}
+ */
+function $(e, parent) {
+    return !e || e.length == 0
+        ? // null or empty string returns empty array
+          []
+        : e.nodeName
+            ? // a single element is wrapped in an array
+              [e]
+            : // selector and NodeList are converted to Element[]
+              [].slice.call(e[0].nodeName ? e : (parent || root).querySelectorAll(e));
+}
+
+/**
+ * Creates and fills an array with the value provided
+ * @param {number} len
+ * @param {() => T} valueProvider
+ * @return {T}
+ * @template T
+ */
+function Array2D(len) {
+    var a = [];
+    for (; len--; ) {
+        a[len] = [];
+    }
+    return a;
+}
+
+/**
+ * A for loop wrapper used to reduce js minified size.
+ * @param {!Array<T>} items 
+ * @param {function(T):void} consumer
+ * @template T
+ */
+function each(items, consumer) {
+    items && items.some(consumer);
+}
+
+/**
+ * @param {T} obj 
+ * @return {function(string):*}
+ * @template T
+ */
+function selectFrom(obj) {
+    return function (key) {
+        return obj[key];
+    }
+}
+
+/**
+ * # Splitting.index
+ * Index split elements and add them to a Splitting instance.
+ *
+ * @param {HTMLElement} element
+ * @param {string} key 
+ * @param {!Array<!HTMLElement> | !Array<!Array<!HTMLElement>>} items 
+ */
+function index(element, key, items) {
+    var prefix = '--' + key;
+    var cssVar = prefix + "-index";
+
+    each(items, function (items, i) {
+        if (Array.isArray(items)) {
+            each(items, function(item) {
+                setProperty(item, cssVar, i);
+            });
+        } else {
+            setProperty(items, cssVar, i);
+        }
+    });
+
+    setProperty(element, prefix + "-total", items.length);
+}
+
+/**
+ * @type {Record<string, import('./types').ISplittingPlugin>}
+ */
+var plugins = {};
+
+/**
+ * @param {string} by
+ * @param {string} parent
+ * @param {!Array<string>} deps
+ * @return {!Array<string>}
+ */
+function resolvePlugins(by, parent, deps) {
+    // skip if already visited this dependency
+    var index = deps.indexOf(by);
+    if (index == -1) {
+        // if new to dependency array, add to the beginning
+        deps.unshift(by);
+
+        // recursively call this function for all dependencies
+        var plugin = plugins[by];
+        if (!plugin) {
+            throw new Error("plugin not loaded: " + by);
+        }
+        each(plugin.depends, function(p) {
+            resolvePlugins(p, by, deps);
+        });
+    } else {
+        // if this dependency was added already move to the left of
+        // the parent dependency so it gets loaded in order
+        var indexOfParent = deps.indexOf(parent);
+        deps.splice(index, 1);
+        deps.splice(indexOfParent, 0, by);
+    }
+    return deps;
+}
+
+/**
+ * Internal utility for creating plugins... essentially to reduce
+ * the size of the library
+ * @param {string} by 
+ * @param {string} key 
+ * @param {string[]} depends 
+ * @param {Function} split 
+ * @returns {import('./types').ISplittingPlugin}
+ */
+function createPlugin(by, depends, key, split) {
+    return {
+        by: by,
+        depends: depends,
+        key: key,
+        split: split
+    }
+}
+
+/**
+ *
+ * @param {string} by
+ * @returns {import('./types').ISplittingPlugin[]}
+ */
+function resolve(by) {
+    return resolvePlugins(by, 0, []).map(selectFrom(plugins));
+}
+
+/**
+ * Adds a new plugin to splitting
+ * @param {import('./types').ISplittingPlugin} opts
+ */
+function add(opts) {
+    plugins[opts.by] = opts;
+}
+
+/**
+ * # Splitting.split
+ * Split an element's textContent into individual elements
+ * @param {!HTMLElement} el  Element to split
+ * @param {string} key 
+ * @param {string} splitOn 
+ * @param {boolean} includePrevious 
+ * @param {boolean} preserveWhitespace
+ * @return {!Array<!HTMLElement>}
+ */
+function splitText(el, key, splitOn, includePrevious, preserveWhitespace) {
+    // Combine any strange text nodes or empty whitespace.
+    el.normalize();
+
+    // Use fragment to prevent unnecessary DOM thrashing.
+    var elements = [];
+    var F = document.createDocumentFragment();
+
+    if (includePrevious) {
+        elements.push(el.previousSibling);
+    }
+
+    var allElements = [];
+    $(el.childNodes).some(function(next) {
+        if (next.tagName && !next.hasChildNodes()) {
+            // keep elements without child nodes (no text and no children)
+            allElements.push(next);
+            return;
+        }
+        // Recursively run through child nodes
+        if (next.childNodes && next.childNodes.length) {
+            allElements.push(next);
+            elements.push.apply(elements, splitText(next, key, splitOn, includePrevious, preserveWhitespace));
+            return;
+        }
+
+        // Get the text to split, trimming out the whitespace
+        /** @type {string} */
+        var wholeText = next.wholeText || '';
+        var contents = wholeText.trim();
+
+        // If there's no text left after trimming whitespace, continue the loop
+        if (contents.length) {
+            // insert leading space if there was one
+            if (wholeText[0] === ' ') {
+                allElements.push(createText(' '));
+            }
+            // Concatenate the split text children back into the full array
+            var useSegmenter = splitOn === "" && typeof Intl.Segmenter === "function";
+            each(useSegmenter ? Array.from(new Intl.Segmenter().segment(contents)).map(function(x){return x.segment}) : contents.split(splitOn), function (splitText, i) {
+                if (i && preserveWhitespace) {
+                    allElements.push(createElement(F, "whitespace", " ", preserveWhitespace));
+                }
+                var splitEl = createElement(F, key, splitText);
+                elements.push(splitEl);
+                allElements.push(splitEl);
+            }); 
+            // insert trailing space if there was one
+            if (wholeText[wholeText.length - 1] === ' ') {
+                allElements.push(createText(' '));
+            }
+        }
+    });
+
+    each(allElements, function(el) {
+        appendChild(F, el);
+    });
+
+    // Clear out the existing element
+    el.innerHTML = "";
+    appendChild(el, F);
+    return elements;
+}
+
+/** an empty value */
+var _ = 0;
+
+function copy(dest, src) {
+    for (var k in src) {
+        dest[k] = src[k];
+    }
+    return dest;
+}
+
+var WORDS = 'words';
+
+var wordPlugin = createPlugin(
+    /* by= */ WORDS,
+    /* depends= */ _,
+    /* key= */ 'word', 
+    /* split= */ function(el) {
+        return splitText(el, 'word', /\s+/, 0, 1)
+    }
+);
+
+var CHARS = "chars";
+
+var charPlugin = createPlugin(
+    /* by= */ CHARS,
+    /* depends= */ [WORDS],
+    /* key= */ "char", 
+    /* split= */ function(el, options, ctx) {
+        var results = [];
+
+        each(ctx[WORDS], function(word, i) {
+            results.push.apply(results, splitText(word, "char", "", options.whitespace && i));
+        });
+
+        return results;
+    }
+);
+
+/**
+ * # Splitting
+ * 
+ * @param {import('./types').ISplittingOptions} opts
+ * @return {!Array<*>}
+ */
+function Splitting (opts) {
+  opts = opts || {};
+  var key = opts.key;
+
+  return $(opts.target || '[data-splitting]').map(function(el) {
+    var ctx = el['🍌'];  
+    if (!opts.force && ctx) {
+      return ctx;
+    }
+
+    ctx = el['🍌'] = { el: el };
+    var by = opts.by || getData(el, 'splitting');
+    if (!by || by == 'true') {
+      by = CHARS;
+    }
+    var items = resolve(by);
+    var opts2 = copy({}, opts);
+    each(items, function(plugin) {
+      if (plugin.split) {
+        var pluginBy = plugin.by;
+        var key2 = (key ? '-' + key : '') + plugin.key;
+        var results = plugin.split(el, opts2, ctx);
+        key2 && index(el, key2, results);
+        ctx[pluginBy] = results;
+        el.classList.add(pluginBy);
+      } 
+    });
+
+    el.classList.add('splitting');
+    return ctx;
+  })
+}
+
+/**
+ * # Splitting.html
+ * 
+ * @param {import('./types').ISplittingOptions} opts
+ */
+function html(opts) {
+  opts = opts || {};
+  var parent = opts.target =  createElement();
+  parent.innerHTML = opts.content;
+  Splitting(opts);
+  return parent.outerHTML
+}
+
+Splitting.html = html;
+Splitting.add = add;
+
+/**
+ * Detects the grid by measuring which elements align to a side of it.
+ * @param {!HTMLElement} el 
+ * @param {import('../core/types').ISplittingOptions} options
+ * @param {*} side 
+ */
+function detectGrid(el, options, side) {
+    var items = $(options.matching || el.children, el);
+    var c = {};
+
+    each(items, function(w) {
+        var val = Math.round(w[side]);
+        (c[val] || (c[val] = [])).push(w);
+    });
+
+    return Object.keys(c).map(Number).sort(byNumber).map(selectFrom(c));
+}
+
+/**
+ * Sorting function for numbers.
+ * @param {number} a 
+ * @param {number} b
+ * @return {number} 
+ */
+function byNumber(a, b) {
+    return a - b;
+}
+
+var linePlugin = createPlugin(
+    /* by= */ 'lines',
+    /* depends= */ [WORDS],
+    /* key= */ 'line',
+    /* split= */ function(el, options, ctx) {
+      return detectGrid(el, { matching: ctx[WORDS] }, 'offsetTop')
+    }
+);
+
+var itemPlugin = createPlugin(
+    /* by= */ 'items',
+    /* depends= */ _,
+    /* key= */ 'item', 
+    /* split= */ function(el, options) {
+        return $(options.matching || el.children, el)
+    }
+);
+
+var rowPlugin = createPlugin(
+    /* by= */ 'rows',
+    /* depends= */ _,
+    /* key= */ 'row', 
+    /* split= */ function(el, options) {
+        return detectGrid(el, options, "offsetTop");
+    }
+);
+
+var columnPlugin = createPlugin(
+    /* by= */ 'cols',
+    /* depends= */ _,
+    /* key= */ "col", 
+    /* split= */ function(el, options) {
+        return detectGrid(el, options, "offsetLeft");
+    }
+);
+
+var gridPlugin = createPlugin(
+    /* by= */ 'grid',
+    /* depends= */ ['rows', 'cols']
+);
+
+var LAYOUT = "layout";
+
+var layoutPlugin = createPlugin(
+    /* by= */ LAYOUT,
+    /* depends= */ _,
+    /* key= */ _,
+    /* split= */ function(el, opts) {
+        // detect and set options
+        var rows =  opts.rows = +(opts.rows || getData(el, 'rows') || 1);
+        var columns = opts.columns = +(opts.columns || getData(el, 'columns') || 1);
+
+        // Seek out the first <img> if the value is true 
+        opts.image = opts.image || getData(el, 'image') || el.currentSrc || el.src;
+        if (opts.image) {
+            var img = $("img", el)[0];
+            opts.image = img && (img.currentSrc || img.src);
+        }
+
+        // add optional image to background
+        if (opts.image) {
+            setProperty(el, "background-image", "url(" + opts.image + ")");
+        }
+
+        var totalCells = rows * columns;
+        var elements = [];
+
+        var container = createElement(_, "cell-grid");
+        while (totalCells--) {
+            // Create a span
+            var cell = createElement(container, "cell");
+            createElement(cell, "cell-inner");
+            elements.push(cell);
+        }
+
+        // Append elements back into the parent
+        appendChild(el, container);
+
+        return elements;
+    }
+);
+
+var cellRowPlugin = createPlugin(
+    /* by= */ "cellRows",
+    /* depends= */ [LAYOUT],
+    /* key= */ "row",
+    /* split= */ function(el, opts, ctx) {
+        var rowCount = opts.rows;
+        var result = Array2D(rowCount);
+
+        each(ctx[LAYOUT], function(cell, i, src) {
+            result[Math.floor(i / (src.length / rowCount))].push(cell);
+        });
+
+        return result;
+    }
+);
+
+var cellColumnPlugin = createPlugin(
+    /* by= */ "cellColumns",
+    /* depends= */ [LAYOUT],
+    /* key= */ "col",
+    /* split= */ function(el, opts, ctx) {
+        var columnCount = opts.columns;
+        var result = Array2D(columnCount);
+
+        each(ctx[LAYOUT], function(cell, i) {
+            result[i % columnCount].push(cell);
+        });
+
+        return result;
+    }
+);
+
+var cellPlugin = createPlugin(
+    /* by= */ "cells",
+    /* depends= */ ['cellRows', 'cellColumns'],
+    /* key= */ "cell", 
+    /* split= */ function(el, opt, ctx) { 
+        // re-index the layout as the cells
+        return ctx[LAYOUT];
+    }
+);
+
+// install plugins
+// word/char plugins
+add(wordPlugin);
+add(charPlugin);
+add(linePlugin);
+// grid plugins
+add(itemPlugin);
+add(rowPlugin);
+add(columnPlugin);
+add(gridPlugin);
+// cell-layout plugins
+add(layoutPlugin);
+add(cellRowPlugin);
+add(cellColumnPlugin);
+add(cellPlugin);
+
+return Splitting;
+
+})));
+
+},{}],"team/js/panel.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Panel = void 0;
+var _gsap = require("gsap");
+var _panelItem = require("./panelItem");
+require("splitting/dist/splitting.css");
+require("splitting/dist/splitting-cells.css");
+var _splitting2 = _interopRequireDefault(require("splitting"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+// initialize Splitting
+const splitting = (0, _splitting2.default)();
+Array.prototype.except = function (val) {
+  return this.filter(function (x) {
+    return x !== val;
+  });
+};
+class Panel {
+  constructor(el) {
+    this.DOM = {
+      el: el
+    };
+    this.DOM.items = [...this.DOM.el.querySelectorAll('.panel__item')];
+    // array of Item
+    this.items = [];
+    this.DOM.items.forEach(item => this.items.push(new _panelItem.PanelItem(item)));
+    // position the images and the subtitle chars (centered on top of the image)
+    this.layout();
+    // Init events
+    this.initEvents();
+  }
+  calcImgPosition(imgWrap) {
+    const imgRect = imgWrap.getBoundingClientRect();
+    // the second image will be in the center of the panel, while the first and third will be left and right aligned to the panel
+    const centeredVal = this.rect.width / 2 - imgRect.width / 2;
+    let tx = 0;
+    switch (this.DOM.items.indexOf(imgWrap.parentNode)) {
+      case 0:
+        tx = centeredVal - imgRect.width - this.marginImages;
+        break;
+      case 2:
+        tx = centeredVal + imgRect.width + this.marginImages;
+        break;
+      default:
+        tx = centeredVal;
+        break;
+    }
+    return {
+      tx: tx
+    };
+  }
+  positionItemChars(item) {
+    const imgRect = item.DOM.imgWrap.getBoundingClientRect();
+    for (const [_, char] of item.DOM.subtitleChars.entries()) {
+      // reset values (for resize purposes)
+      _gsap.gsap.set(char, {
+        x: 0,
+        y: 0
+      });
+      // translate the char
+      const subtitleCharRect = char.getBoundingClientRect();
+      const charPosition = {
+        x: imgRect.left + imgRect.width / 2 - subtitleCharRect.left - subtitleCharRect.width / 2 + _gsap.gsap.utils.random(-150, 150),
+        y: imgRect.top + imgRect.height / 2 - subtitleCharRect.top - subtitleCharRect.height / 2 + _gsap.gsap.utils.random(-250, 250)
+      };
+      _gsap.gsap.set(char, charPosition);
+      char.dataset.tx = charPosition.x;
+      char.dataset.ty = charPosition.y;
+    }
+  }
+  layout() {
+    //if ( this.isOpen ) return;
+
+    this.rect = this.DOM.el.getBoundingClientRect();
+    // margin between the images
+    this.marginImages = parseInt(getComputedStyle(document.body).getPropertyValue('--margin-images'), 10);
+    for (const [index, item] of this.items.entries()) {
+      if (this.isOpen && index === this.currentItemIdx) {
+        continue;
+      }
+
+      // how much to translate the image
+      // initially all the images are stacked and left aligned with the main "".panel"
+      const imgPosition = this.calcImgPosition(item.DOM.imgWrap);
+      // set the new position
+      _gsap.gsap.set(item.DOM.imgWrap, {
+        x: imgPosition.tx
+      });
+      // now let's center all the panel item's subtitle chars on top of the image
+      this.positionItemChars(item);
+    }
+  }
+  initEvents() {
+    // resize
+    window.addEventListener('resize', () => this.layout());
+
+    // mouseenter/mouseleave/click/close
+    for (const item of this.items) {
+      item.DOM.imgWrap.addEventListener('mouseenter', () => this.showItemChars(item));
+      item.DOM.imgWrap.addEventListener('mouseleave', () => this.hideItemChars(item));
+      item.DOM.imgWrap.addEventListener('click', () => this.openItem(item));
+      item.DOM.closeCtrl.addEventListener('click', () => this.closeItem(item));
+    }
+  }
+  showItemChars(item) {
+    if (this.isOpen) return;
+    item.killActiveTimeline();
+
+    // reset
+    this.positionItemChars(item);
+    item.timelineIn = _gsap.gsap.timeline().addLabel('start', 0).set(item.DOM.subtitleText, {
+      opacity: 1
+    }, 'start')
+    // random value for the scale
+    .set(item.DOM.subtitleChars, {
+      opacity: 0,
+      scale: () => _gsap.gsap.utils.random(1.1, 2.1)
+    }, 'start')
+    // add/subtract a random value to the current translation value of each char
+    .to(item.DOM.subtitleChars, {
+      duration: 0.2,
+      ease: 'power2.in',
+      x: i => `+=${i % 2 ? 0 : _gsap.gsap.utils.random(-40, 40)}`,
+      y: i => `+=${i % 2 ? _gsap.gsap.utils.random(-40, 40) : 0}`,
+      opacity: 1,
+      stagger: 0.01
+    }, 'start')
+    // also scale up the image and its parent
+    .to(item.DOM.img, {
+      duration: 1,
+      ease: 'power4',
+      scale: 1.1
+    }, 'start').to(item.DOM.imgWrap, {
+      duration: 1,
+      ease: 'power4',
+      scale: 0.95
+    }, 'start');
+  }
+  hideItemChars(item) {
+    if (this.isOpen) return;
+    item.killActiveTimeline();
+    item.timelineOut = _gsap.gsap.timeline().addLabel('start', 0).to(item.DOM.subtitleChars, {
+      duration: 0.3,
+      ease: 'power3.inOut',
+      x: i => `+=${i % 2 ? _gsap.gsap.utils.random(-20, 20) : 0}`,
+      y: i => `+=${i % 2 ? 0 : _gsap.gsap.utils.random(-20, 20)}`,
+      opacity: 0,
+      stagger: 0.01
+    }, 'start').to([item.DOM.img, item.DOM.imgWrap], {
+      duration: 1,
+      ease: 'power4',
+      scale: 1
+    }, 'start').set(item.DOM.subtitleChars, {
+      x: (_, t) => t.dataset.tx,
+      y: (_, t) => t.dataset.ty,
+      scale: 1
+    }).set(item.DOM.subtitleText, {
+      opacity: 0
+    });
+  }
+  openItem(item) {
+    if (this.isOpen) return;
+    this.isOpen = true;
+    this.currentItemIdx = this.items.indexOf(item);
+
+    //item.killActiveTimeline();
+
+    // all other items (the .imgWrap element)
+    const otherImgWrap = this.items.except(item).map(item => item.DOM.imgWrap);
+    _gsap.gsap.timeline({
+      onStart: () => item.DOM.el.classList.add('panel__item--open')
+    }).addLabel('start', 0)
+    // translate and fade out all other items (the .imgWrap element)
+    .to(otherImgWrap, {
+      duration: 1,
+      ease: 'power4.inOut',
+      x: '+=20%',
+      opacity: 0
+    }, 'start')
+    // translate the .imgWrap element of the clicked item to 0
+    .to(item.DOM.imgWrap, {
+      duration: 1,
+      ease: 'power4.inOut',
+      x: 0
+    }, 'start')
+    // scale both the image and its parent down to 1
+    .to([item.DOM.img, item.DOM.imgWrap], {
+      duration: 1,
+      ease: 'power4.inOut',
+      scale: 1
+    }, 'start')
+    // show/animate the subtitle header element
+    .to(item.DOM.subtitleHeader, {
+      duration: 1,
+      ease: 'power4.inOut',
+      startAt: {
+        x: 20
+      },
+      opacity: 1,
+      x: 0
+    }, 'start')
+    // show/animate the close button
+    .to(item.DOM.closeCtrl, {
+      duration: 1,
+      ease: 'power4.inOut',
+      startAt: {
+        scale: 0
+      },
+      opacity: 1,
+      scale: 1
+    }, 'start')
+    // chars translate back to 0 and scale down to 1
+    .to(item.DOM.subtitleChars, {
+      duration: 0.4,
+      ease: 'power4.inOut',
+      x: 0,
+      y: 0,
+      scale: 1,
+      opacity: 1,
+      stagger: 0.03
+    }, 'start+=0.1')
+    // animate in the title
+    .to(item.DOM.titleTexts, {
+      duration: 0.8,
+      ease: 'power4',
+      startAt: {
+        x: i => i ? 100 : -100
+      },
+      opacity: 1,
+      x: 0,
+      rotation: 0.001,
+      stagger: -0.05
+    }, 'start+=0.6');
+  }
+  closeItem(item) {
+    if (!this.isOpen) return;
+    this.currentItemIdx = -1;
+
+    //item.killActiveTimeline();
+
+    _gsap.gsap.timeline({
+      onComplete: () => {
+        item.DOM.el.classList.remove('panel__item--open');
+        this.isOpen = false;
+      }
+    }).addLabel('start', 0).to(item.DOM.closeCtrl, {
+      duration: 0.7,
+      ease: 'power3',
+      opacity: 0,
+      scale: 0.5
+    }, 'start').to(item.DOM.titleTexts, {
+      duration: 0.7,
+      ease: 'power4.inOut',
+      opacity: 0,
+      x: i => i ? 100 : -100,
+      rotation: 0.001
+    }, 'start').to(item.DOM.subtitleHeader, {
+      duration: 0.7,
+      ease: 'power4.inOut',
+      opacity: 0,
+      x: 20
+    }, 'start').to(item.DOM.imgWrap, {
+      duration: 0.7,
+      ease: 'power4.inOut',
+      x: (_, t) => this.calcImgPosition(t).tx
+    }, 'start').to(this.items.except(item).map(item => item.DOM.imgWrap), {
+      duration: 0.7,
+      ease: 'power4.inOut',
+      startAt: {
+        x: '+=20%'
+      },
+      x: (_, t) => this.calcImgPosition(t).tx,
+      opacity: 1
+    }, 'start').to(item.DOM.subtitleChars, {
+      duration: 0.4,
+      ease: 'power4.inOut',
+      x: i => _gsap.gsap.utils.random(-100, 100),
+      y: i => _gsap.gsap.utils.random(-100, 100),
+      scale: () => _gsap.gsap.utils.random(1.1, 2.1),
+      opacity: 0,
+      stagger: -0.01
+    }, 'start');
+  }
+}
+exports.Panel = Panel;
+},{"gsap":"../node_modules/gsap/index.js","./panelItem":"team/js/panelItem.js","splitting/dist/splitting.css":"../node_modules/splitting/dist/splitting.css","splitting/dist/splitting-cells.css":"../node_modules/splitting/dist/splitting-cells.css","splitting":"../node_modules/splitting/dist/splitting.js"}],"team/js/cursor.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _gsap = require("gsap");
+var _utils = require("./utils");
+// Track the mouse position
+let mouse = {
+  x: 0,
+  y: 0
+};
+window.addEventListener('mousemove', ev => mouse = (0, _utils.getMousePos)(ev));
+class Cursor {
+  constructor(el) {
+    this.DOM = {
+      el: el
+    };
+    this.DOM.el.style.opacity = 0;
+    this.bounds = this.DOM.el.getBoundingClientRect();
+    this.renderedStyles = {
+      tx: {
+        previous: 0,
+        current: 0,
+        amt: 0.2
+      },
+      ty: {
+        previous: 0,
+        current: 0,
+        amt: 0.2
+      },
+      scale: {
+        previous: 1,
+        current: 1,
+        amt: 0.15
+      },
+      opacity: {
+        previous: 1,
+        current: 1,
+        amt: 0.1
+      }
+    };
+    this.onMouseMoveEv = () => {
+      this.renderedStyles.tx.previous = this.renderedStyles.tx.current = mouse.x - this.bounds.width / 2;
+      this.renderedStyles.ty.previous = this.renderedStyles.ty.previous = mouse.y - this.bounds.height / 2;
+      _gsap.gsap.to(this.DOM.el, {
+        duration: 0.9,
+        ease: 'Power3.easeOut',
+        opacity: 1
+      });
+      requestAnimationFrame(() => this.render());
+      window.removeEventListener('mousemove', this.onMouseMoveEv);
+    };
+    window.addEventListener('mousemove', this.onMouseMoveEv);
+  }
+  enter() {
+    this.renderedStyles['scale'].current = 2.5;
+    this.renderedStyles['opacity'].current = 0.5;
+  }
+  leave() {
+    this.renderedStyles['scale'].current = 1;
+    this.renderedStyles['opacity'].current = 1;
+  }
+  render() {
+    this.renderedStyles['tx'].current = mouse.x - this.bounds.width / 2;
+    this.renderedStyles['ty'].current = mouse.y - this.bounds.height / 2;
+    for (const key in this.renderedStyles) {
+      this.renderedStyles[key].previous = (0, _utils.lerp)(this.renderedStyles[key].previous, this.renderedStyles[key].current, this.renderedStyles[key].amt);
+    }
+    this.DOM.el.style.transform = `translateX(${this.renderedStyles['tx'].previous}px) translateY(${this.renderedStyles['ty'].previous}px) scale(${this.renderedStyles['scale'].previous})`;
+    this.DOM.el.style.opacity = this.renderedStyles['opacity'].previous;
+    requestAnimationFrame(() => this.render());
+  }
+}
+exports.default = Cursor;
+},{"gsap":"../node_modules/gsap/index.js","./utils":"team/js/utils.js"}],"team/js/index.js":[function(require,module,exports) {
 "use strict";
 
 var _utils = require("./utils");
-var _gsap = require("gsap");
-// preload images then remove loader (loading class) 
-(0, _utils.preloadImages)('.tiles__line-img').then(() => document.body.classList.remove('loading'));
+var _panel = require("./panel");
+var _cursor = _interopRequireDefault(require("./cursor"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+const panels = [...document.querySelectorAll('.panel')];
 
-// frame element
-const frame = document.querySelector('.frame');
+// Preload all images
+(0, _utils.preloadImages)().then(() => {
+  // remove loader (loading class) 
+  document.body.classList.remove('loading');
+  panels.forEach(panel => new _panel.Panel(panel));
 
-// overlay (SVG path element)
-const overlayPath = document.querySelector('.overlay__path');
+  // initialize custom cursor
+  const cursor = new _cursor.default(document.querySelector('.cursor'));
 
-// menu (wrap) element
-const menuWrap = document.querySelector('.menu-wrap');
-
-// menu items
-const menuItems = menuWrap.querySelectorAll('.menu__item');
-
-// open menu button
-const openMenuCtrl = document.querySelector('button.button-menu');
-
-// close menu button
-const closeMenuCtrl = menuWrap.querySelector('.button-close');
-
-// big title elements
-const title = {
-  main: document.querySelector('.content__title-main'),
-  sub: document.querySelector('.content__title-sub')
-};
-let isAnimating = false;
-
-// opens the menu
-const openMenu = () => {
-  if (isAnimating) return;
-  isAnimating = true;
-  _gsap.gsap.timeline({
-    onComplete: () => isAnimating = false
-  }).set(overlayPath, {
-    attr: {
-      d: 'M 0 100 V 100 Q 50 100 100 100 V 100 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.8,
-    ease: 'power4.in',
-    attr: {
-      d: 'M 0 100 V 50 Q 50 0 100 50 V 100 z'
-    }
-  }, 0).to(overlayPath, {
-    duration: 0.3,
-    ease: 'power2',
-    attr: {
-      d: 'M 0 100 V 0 Q 50 0 100 0 V 100 z'
-    },
-    onComplete: () => {
-      frame.classList.add('frame--menu-open');
-      menuWrap.classList.add('menu-wrap--open');
-    }
-  })
-  // title elements
-  .to([title.main, title.sub], {
-    duration: 0.8,
-    ease: 'power3.in',
-    y: -200,
-    stagger: 0.05
-  }, 0.2)
-
-  // now reveal
-  .set(menuItems, {
-    opacity: 0
-  }).set(overlayPath, {
-    attr: {
-      d: 'M 0 0 V 100 Q 50 100 100 100 V 0 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.3,
-    ease: 'power2.in',
-    attr: {
-      d: 'M 0 0 V 50 Q 50 0 100 50 V 0 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.8,
-    ease: 'power4',
-    attr: {
-      d: 'M 0 0 V 0 Q 50 0 100 0 V 0 z'
-    }
-  })
-  // menu items translate animation
-  .to(menuItems, {
-    duration: 1.1,
-    ease: 'power4',
-    startAt: {
-      y: 150
-    },
-    y: 0,
-    opacity: 1,
-    stagger: 0.05
-  }, '>-=1.1');
-};
-
-// closes the menu
-const closeMenu = () => {
-  if (isAnimating) return;
-  isAnimating = true;
-  _gsap.gsap.timeline({
-    onComplete: () => isAnimating = false
-  }).set(overlayPath, {
-    attr: {
-      d: 'M 0 0 V 0 Q 50 0 100 0 V 0 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.8,
-    ease: 'power4.in',
-    attr: {
-      d: 'M 0 0 V 50 Q 50 100 100 50 V 0 z'
-    }
-  }, 0).to(overlayPath, {
-    duration: 0.3,
-    ease: 'power2',
-    attr: {
-      d: 'M 0 0 V 100 Q 50 100 100 100 V 0 z'
-    },
-    onComplete: () => {
-      frame.classList.remove('frame--menu-open');
-      menuWrap.classList.remove('menu-wrap--open');
-    }
-  })
-  // now reveal
-  .set(overlayPath, {
-    attr: {
-      d: 'M 0 100 V 0 Q 50 0 100 0 V 100 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.3,
-    ease: 'power2.in',
-    attr: {
-      d: 'M 0 100 V 50 Q 50 100 100 50 V 100 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.8,
-    ease: 'power4',
-    attr: {
-      d: 'M 0 100 V 100 Q 50 100 100 100 V 100 z'
-    }
-  })
-  // title elements
-  .to([title.main, title.sub], {
-    duration: 1.1,
-    ease: 'power4',
-    y: 0,
-    stagger: -0.05
-  }, '>-=1.1')
-  // menu items translate animation
-  .to(menuItems, {
-    duration: 0.8,
-    ease: 'power2.in',
-    y: 100,
-    opacity: 0,
-    stagger: -0.05
-  }, 0);
-};
-
-// click on menu button
-openMenuCtrl.addEventListener('click', openMenu);
-// click on close menu button
-closeMenuCtrl.addEventListener('click', closeMenu);
-},{"./utils":"js/utils.js","gsap":"../node_modules/gsap/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+  // mouse effects on all links and others
+  [...document.querySelectorAll('a, .panel__item-imgwrap, button')].forEach(link => {
+    link.addEventListener('mouseenter', () => cursor.enter());
+    link.addEventListener('mouseleave', () => cursor.leave());
+  });
+});
+},{"./utils":"team/js/utils.js","./panel":"team/js/panel.js","./cursor":"team/js/cursor.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -6199,7 +7020,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "9029" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "9754" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
@@ -6343,5 +7164,117 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/index.js"], null)
-//# sourceMappingURL=/js.00a46daa.js.map
+},{}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+var bundleURL = null;
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
+  }
+  return bundleURL;
+}
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
+    if (matches) {
+      return getBaseURL(matches[0]);
+    }
+  }
+  return '/';
+}
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)?\/[^/]+(?:\?.*)?$/, '$1') + '/';
+}
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],"../node_modules/parcel-bundler/src/builtins/bundle-loader.js":[function(require,module,exports) {
+var getBundleURL = require('./bundle-url').getBundleURL;
+function loadBundlesLazy(bundles) {
+  if (!Array.isArray(bundles)) {
+    bundles = [bundles];
+  }
+  var id = bundles[bundles.length - 1];
+  try {
+    return Promise.resolve(require(id));
+  } catch (err) {
+    if (err.code === 'MODULE_NOT_FOUND') {
+      return new LazyPromise(function (resolve, reject) {
+        loadBundles(bundles.slice(0, -1)).then(function () {
+          return require(id);
+        }).then(resolve, reject);
+      });
+    }
+    throw err;
+  }
+}
+function loadBundles(bundles) {
+  return Promise.all(bundles.map(loadBundle));
+}
+var bundleLoaders = {};
+function registerBundleLoader(type, loader) {
+  bundleLoaders[type] = loader;
+}
+module.exports = exports = loadBundlesLazy;
+exports.load = loadBundles;
+exports.register = registerBundleLoader;
+var bundles = {};
+function loadBundle(bundle) {
+  var id;
+  if (Array.isArray(bundle)) {
+    id = bundle[1];
+    bundle = bundle[0];
+  }
+  if (bundles[bundle]) {
+    return bundles[bundle];
+  }
+  var type = (bundle.substring(bundle.lastIndexOf('.') + 1, bundle.length) || bundle).toLowerCase();
+  var bundleLoader = bundleLoaders[type];
+  if (bundleLoader) {
+    return bundles[bundle] = bundleLoader(getBundleURL() + bundle).then(function (resolved) {
+      if (resolved) {
+        module.bundle.register(id, resolved);
+      }
+      return resolved;
+    }).catch(function (e) {
+      delete bundles[bundle];
+      throw e;
+    });
+  }
+}
+function LazyPromise(executor) {
+  this.executor = executor;
+  this.promise = null;
+}
+LazyPromise.prototype.then = function (onSuccess, onError) {
+  if (this.promise === null) this.promise = new Promise(this.executor);
+  return this.promise.then(onSuccess, onError);
+};
+LazyPromise.prototype.catch = function (onError) {
+  if (this.promise === null) this.promise = new Promise(this.executor);
+  return this.promise.catch(onError);
+};
+},{"./bundle-url":"../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../node_modules/parcel-bundler/src/builtins/loaders/browser/js-loader.js":[function(require,module,exports) {
+module.exports = function loadJSBundle(bundle) {
+  return new Promise(function (resolve, reject) {
+    var script = document.createElement('script');
+    script.async = true;
+    script.type = 'text/javascript';
+    script.charset = 'utf-8';
+    script.src = bundle;
+    script.onerror = function (e) {
+      script.onerror = script.onload = null;
+      reject(e);
+    };
+    script.onload = function () {
+      script.onerror = script.onload = null;
+      resolve();
+    };
+    document.getElementsByTagName('head')[0].appendChild(script);
+  });
+};
+},{}],0:[function(require,module,exports) {
+var b=require("../node_modules/parcel-bundler/src/builtins/bundle-loader.js");b.register("js",require("../node_modules/parcel-bundler/src/builtins/loaders/browser/js-loader.js"));b.load([]).then(function(){require("team/js/index.js");});
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js",0], null)
+//# sourceMappingURL=/js.7b31382a.js.map

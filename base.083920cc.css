@@ -12,8 +12,9 @@ body {
 	margin: 0;
 	--color-text: #000100;
 	--color-bg: #e2d9c7;
-	--color-link: #395bb5;
-	--color-link-hover: #000100;
+	--color-link: #aaa;
+	--color-link-alt: #79a18a;
+	--color-link-hover: #fff;
 	--color-gallery-title: #2c2724;
 	--color-gallery-number: #d9d0be;
 	--color-gallery-link: #fff;
@@ -24,7 +25,7 @@ body {
 	background-color: var(--color-bg);
 	--cursor-stroke: none;
 	--cursor-fill: #c5681c;
-	--cursor-stroke-width: 1px;
+	/* --cursor-stroke-width: 1px; */
 	font-family: halyard-display, sans-serif;
 	font-weight: 300;
 	-webkit-font-smoothing: antialiased;
@@ -90,7 +91,7 @@ a:focus {
 .frame__title {
 	font-size: 1rem;
 	margin: 0 0 1rem;
-	font-weight: 300;
+	font-weight: normal;
 }
 
 .frame__links {

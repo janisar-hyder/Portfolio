@@ -1,20 +1,20 @@
 
 body {
+	--cursor-stroke: #f1490a;
 	--color-text: #fff;
 	--color-bg: #111;
 	--color-link: #d75828;
 	--color-link-hover: #fff;
 	--color-gallery-title: #463832;
 	--color-gallery-number: #ffffff;
-	--color-gallery-link: #fff;
+	--color-link: #aaa;
+	--color-link-alt: #79a18a;
+	--color-link-hover: #fff;
 	--color-gallery-link-bg: #d75828;
 	--color-gallery-link-hover: #fff;
 	--color-gallery-link-bg-hover: #d4b77d;
 	color: var(--color-text);
 	background-color: var(--color-bg);
-	--cursor-stroke: none;
-	--cursor-fill: #ffffff;
-	--cursor-stroke-width: 1px;
 }
 
 .gallery {
@@ -142,6 +142,32 @@ body {
 
 .gallery__text-inner {
 	display: block;
+}
+.cursor {
+	display: none;
+}
+
+
+@media (any-pointer:fine) {
+	.cursor {
+		position: fixed;
+		top: 0;
+		left: 0;
+		display: block;
+		pointer-events: none;
+		z-index: 10000;
+	}
+
+	.cursor__inner {
+		fill: none;
+		stroke: var(--cursor-stroke);
+		stroke-width: 1px;
+	}
+
+	.no-js .cursor {
+		display: none;
+	}
+
 }
 
 /*# sourceMappingURL=/demo5.9894ab4a.css.map */

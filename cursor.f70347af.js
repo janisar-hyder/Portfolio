@@ -117,522 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../node_modules/ev-emitter/ev-emitter.js":[function(require,module,exports) {
-var define;
-var global = arguments[3];
-/**
- * EvEmitter v1.1.0
- * Lil' event emitter
- * MIT License
- */
-
-/* jshint unused: true, undef: true, strict: true */
-
-( function( global, factory ) {
-  // universal module definition
-  /* jshint strict: false */ /* globals define, module, window */
-  if ( typeof define == 'function' && define.amd ) {
-    // AMD - RequireJS
-    define( factory );
-  } else if ( typeof module == 'object' && module.exports ) {
-    // CommonJS - Browserify, Webpack
-    module.exports = factory();
-  } else {
-    // Browser globals
-    global.EvEmitter = factory();
-  }
-
-}( typeof window != 'undefined' ? window : this, function() {
-
-"use strict";
-
-function EvEmitter() {}
-
-var proto = EvEmitter.prototype;
-
-proto.on = function( eventName, listener ) {
-  if ( !eventName || !listener ) {
-    return;
-  }
-  // set events hash
-  var events = this._events = this._events || {};
-  // set listeners array
-  var listeners = events[ eventName ] = events[ eventName ] || [];
-  // only add once
-  if ( listeners.indexOf( listener ) == -1 ) {
-    listeners.push( listener );
-  }
-
-  return this;
-};
-
-proto.once = function( eventName, listener ) {
-  if ( !eventName || !listener ) {
-    return;
-  }
-  // add event
-  this.on( eventName, listener );
-  // set once flag
-  // set onceEvents hash
-  var onceEvents = this._onceEvents = this._onceEvents || {};
-  // set onceListeners object
-  var onceListeners = onceEvents[ eventName ] = onceEvents[ eventName ] || {};
-  // set flag
-  onceListeners[ listener ] = true;
-
-  return this;
-};
-
-proto.off = function( eventName, listener ) {
-  var listeners = this._events && this._events[ eventName ];
-  if ( !listeners || !listeners.length ) {
-    return;
-  }
-  var index = listeners.indexOf( listener );
-  if ( index != -1 ) {
-    listeners.splice( index, 1 );
-  }
-
-  return this;
-};
-
-proto.emitEvent = function( eventName, args ) {
-  var listeners = this._events && this._events[ eventName ];
-  if ( !listeners || !listeners.length ) {
-    return;
-  }
-  // copy over to avoid interference if .off() in listener
-  listeners = listeners.slice(0);
-  args = args || [];
-  // once stuff
-  var onceListeners = this._onceEvents && this._onceEvents[ eventName ];
-
-  for ( var i=0; i < listeners.length; i++ ) {
-    var listener = listeners[i]
-    var isOnce = onceListeners && onceListeners[ listener ];
-    if ( isOnce ) {
-      // remove listener
-      // remove before trigger to prevent recursion
-      this.off( eventName, listener );
-      // unset once flag
-      delete onceListeners[ listener ];
-    }
-    // trigger listener
-    listener.apply( this, args );
-  }
-
-  return this;
-};
-
-proto.allOff = function() {
-  delete this._events;
-  delete this._onceEvents;
-};
-
-return EvEmitter;
-
-}));
-
-},{}],"../node_modules/imagesloaded/imagesloaded.js":[function(require,module,exports) {
-var define;
-/*!
- * imagesLoaded v4.1.4
- * JavaScript is all like "You images are done yet or what?"
- * MIT License
- */
-
-( function( window, factory ) { 'use strict';
-  // universal module definition
-
-  /*global define: false, module: false, require: false */
-
-  if ( typeof define == 'function' && define.amd ) {
-    // AMD
-    define( [
-      'ev-emitter/ev-emitter'
-    ], function( EvEmitter ) {
-      return factory( window, EvEmitter );
-    });
-  } else if ( typeof module == 'object' && module.exports ) {
-    // CommonJS
-    module.exports = factory(
-      window,
-      require('ev-emitter')
-    );
-  } else {
-    // browser global
-    window.imagesLoaded = factory(
-      window,
-      window.EvEmitter
-    );
-  }
-
-})( typeof window !== 'undefined' ? window : this,
-
-// --------------------------  factory -------------------------- //
-
-function factory( window, EvEmitter ) {
-
-'use strict';
-
-var $ = window.jQuery;
-var console = window.console;
-
-// -------------------------- helpers -------------------------- //
-
-// extend objects
-function extend( a, b ) {
-  for ( var prop in b ) {
-    a[ prop ] = b[ prop ];
-  }
-  return a;
-}
-
-var arraySlice = Array.prototype.slice;
-
-// turn element or nodeList into an array
-function makeArray( obj ) {
-  if ( Array.isArray( obj ) ) {
-    // use object if already an array
-    return obj;
-  }
-
-  var isArrayLike = typeof obj == 'object' && typeof obj.length == 'number';
-  if ( isArrayLike ) {
-    // convert nodeList to array
-    return arraySlice.call( obj );
-  }
-
-  // array of single index
-  return [ obj ];
-}
-
-// -------------------------- imagesLoaded -------------------------- //
-
-/**
- * @param {Array, Element, NodeList, String} elem
- * @param {Object or Function} options - if function, use as callback
- * @param {Function} onAlways - callback function
- */
-function ImagesLoaded( elem, options, onAlways ) {
-  // coerce ImagesLoaded() without new, to be new ImagesLoaded()
-  if ( !( this instanceof ImagesLoaded ) ) {
-    return new ImagesLoaded( elem, options, onAlways );
-  }
-  // use elem as selector string
-  var queryElem = elem;
-  if ( typeof elem == 'string' ) {
-    queryElem = document.querySelectorAll( elem );
-  }
-  // bail if bad element
-  if ( !queryElem ) {
-    console.error( 'Bad element for imagesLoaded ' + ( queryElem || elem ) );
-    return;
-  }
-
-  this.elements = makeArray( queryElem );
-  this.options = extend( {}, this.options );
-  // shift arguments if no options set
-  if ( typeof options == 'function' ) {
-    onAlways = options;
-  } else {
-    extend( this.options, options );
-  }
-
-  if ( onAlways ) {
-    this.on( 'always', onAlways );
-  }
-
-  this.getImages();
-
-  if ( $ ) {
-    // add jQuery Deferred object
-    this.jqDeferred = new $.Deferred();
-  }
-
-  // HACK check async to allow time to bind listeners
-  setTimeout( this.check.bind( this ) );
-}
-
-ImagesLoaded.prototype = Object.create( EvEmitter.prototype );
-
-ImagesLoaded.prototype.options = {};
-
-ImagesLoaded.prototype.getImages = function() {
-  this.images = [];
-
-  // filter & find items if we have an item selector
-  this.elements.forEach( this.addElementImages, this );
-};
-
-/**
- * @param {Node} element
- */
-ImagesLoaded.prototype.addElementImages = function( elem ) {
-  // filter siblings
-  if ( elem.nodeName == 'IMG' ) {
-    this.addImage( elem );
-  }
-  // get background image on element
-  if ( this.options.background === true ) {
-    this.addElementBackgroundImages( elem );
-  }
-
-  // find children
-  // no non-element nodes, #143
-  var nodeType = elem.nodeType;
-  if ( !nodeType || !elementNodeTypes[ nodeType ] ) {
-    return;
-  }
-  var childImgs = elem.querySelectorAll('img');
-  // concat childElems to filterFound array
-  for ( var i=0; i < childImgs.length; i++ ) {
-    var img = childImgs[i];
-    this.addImage( img );
-  }
-
-  // get child background images
-  if ( typeof this.options.background == 'string' ) {
-    var children = elem.querySelectorAll( this.options.background );
-    for ( i=0; i < children.length; i++ ) {
-      var child = children[i];
-      this.addElementBackgroundImages( child );
-    }
-  }
-};
-
-var elementNodeTypes = {
-  1: true,
-  9: true,
-  11: true
-};
-
-ImagesLoaded.prototype.addElementBackgroundImages = function( elem ) {
-  var style = getComputedStyle( elem );
-  if ( !style ) {
-    // Firefox returns null if in a hidden iframe https://bugzil.la/548397
-    return;
-  }
-  // get url inside url("...")
-  var reURL = /url\((['"])?(.*?)\1\)/gi;
-  var matches = reURL.exec( style.backgroundImage );
-  while ( matches !== null ) {
-    var url = matches && matches[2];
-    if ( url ) {
-      this.addBackground( url, elem );
-    }
-    matches = reURL.exec( style.backgroundImage );
-  }
-};
-
-/**
- * @param {Image} img
- */
-ImagesLoaded.prototype.addImage = function( img ) {
-  var loadingImage = new LoadingImage( img );
-  this.images.push( loadingImage );
-};
-
-ImagesLoaded.prototype.addBackground = function( url, elem ) {
-  var background = new Background( url, elem );
-  this.images.push( background );
-};
-
-ImagesLoaded.prototype.check = function() {
-  var _this = this;
-  this.progressedCount = 0;
-  this.hasAnyBroken = false;
-  // complete if no images
-  if ( !this.images.length ) {
-    this.complete();
-    return;
-  }
-
-  function onProgress( image, elem, message ) {
-    // HACK - Chrome triggers event before object properties have changed. #83
-    setTimeout( function() {
-      _this.progress( image, elem, message );
-    });
-  }
-
-  this.images.forEach( function( loadingImage ) {
-    loadingImage.once( 'progress', onProgress );
-    loadingImage.check();
-  });
-};
-
-ImagesLoaded.prototype.progress = function( image, elem, message ) {
-  this.progressedCount++;
-  this.hasAnyBroken = this.hasAnyBroken || !image.isLoaded;
-  // progress event
-  this.emitEvent( 'progress', [ this, image, elem ] );
-  if ( this.jqDeferred && this.jqDeferred.notify ) {
-    this.jqDeferred.notify( this, image );
-  }
-  // check if completed
-  if ( this.progressedCount == this.images.length ) {
-    this.complete();
-  }
-
-  if ( this.options.debug && console ) {
-    console.log( 'progress: ' + message, image, elem );
-  }
-};
-
-ImagesLoaded.prototype.complete = function() {
-  var eventName = this.hasAnyBroken ? 'fail' : 'done';
-  this.isComplete = true;
-  this.emitEvent( eventName, [ this ] );
-  this.emitEvent( 'always', [ this ] );
-  if ( this.jqDeferred ) {
-    var jqMethod = this.hasAnyBroken ? 'reject' : 'resolve';
-    this.jqDeferred[ jqMethod ]( this );
-  }
-};
-
-// --------------------------  -------------------------- //
-
-function LoadingImage( img ) {
-  this.img = img;
-}
-
-LoadingImage.prototype = Object.create( EvEmitter.prototype );
-
-LoadingImage.prototype.check = function() {
-  // If complete is true and browser supports natural sizes,
-  // try to check for image status manually.
-  var isComplete = this.getIsImageComplete();
-  if ( isComplete ) {
-    // report based on naturalWidth
-    this.confirm( this.img.naturalWidth !== 0, 'naturalWidth' );
-    return;
-  }
-
-  // If none of the checks above matched, simulate loading on detached element.
-  this.proxyImage = new Image();
-  this.proxyImage.addEventListener( 'load', this );
-  this.proxyImage.addEventListener( 'error', this );
-  // bind to image as well for Firefox. #191
-  this.img.addEventListener( 'load', this );
-  this.img.addEventListener( 'error', this );
-  this.proxyImage.src = this.img.src;
-};
-
-LoadingImage.prototype.getIsImageComplete = function() {
-  // check for non-zero, non-undefined naturalWidth
-  // fixes Safari+InfiniteScroll+Masonry bug infinite-scroll#671
-  return this.img.complete && this.img.naturalWidth;
-};
-
-LoadingImage.prototype.confirm = function( isLoaded, message ) {
-  this.isLoaded = isLoaded;
-  this.emitEvent( 'progress', [ this, this.img, message ] );
-};
-
-// ----- events ----- //
-
-// trigger specified handler for event type
-LoadingImage.prototype.handleEvent = function( event ) {
-  var method = 'on' + event.type;
-  if ( this[ method ] ) {
-    this[ method ]( event );
-  }
-};
-
-LoadingImage.prototype.onload = function() {
-  this.confirm( true, 'onload' );
-  this.unbindEvents();
-};
-
-LoadingImage.prototype.onerror = function() {
-  this.confirm( false, 'onerror' );
-  this.unbindEvents();
-};
-
-LoadingImage.prototype.unbindEvents = function() {
-  this.proxyImage.removeEventListener( 'load', this );
-  this.proxyImage.removeEventListener( 'error', this );
-  this.img.removeEventListener( 'load', this );
-  this.img.removeEventListener( 'error', this );
-};
-
-// -------------------------- Background -------------------------- //
-
-function Background( url, element ) {
-  this.url = url;
-  this.element = element;
-  this.img = new Image();
-}
-
-// inherit LoadingImage prototype
-Background.prototype = Object.create( LoadingImage.prototype );
-
-Background.prototype.check = function() {
-  this.img.addEventListener( 'load', this );
-  this.img.addEventListener( 'error', this );
-  this.img.src = this.url;
-  // check if image is already complete
-  var isComplete = this.getIsImageComplete();
-  if ( isComplete ) {
-    this.confirm( this.img.naturalWidth !== 0, 'naturalWidth' );
-    this.unbindEvents();
-  }
-};
-
-Background.prototype.unbindEvents = function() {
-  this.img.removeEventListener( 'load', this );
-  this.img.removeEventListener( 'error', this );
-};
-
-Background.prototype.confirm = function( isLoaded, message ) {
-  this.isLoaded = isLoaded;
-  this.emitEvent( 'progress', [ this, this.element, message ] );
-};
-
-// -------------------------- jQuery -------------------------- //
-
-ImagesLoaded.makeJQueryPlugin = function( jQuery ) {
-  jQuery = jQuery || window.jQuery;
-  if ( !jQuery ) {
-    return;
-  }
-  // set local variable
-  $ = jQuery;
-  // $().imagesLoaded()
-  $.fn.imagesLoaded = function( options, callback ) {
-    var instance = new ImagesLoaded( this, options, callback );
-    return instance.jqDeferred.promise( $(this) );
-  };
-};
-// try making plugin
-ImagesLoaded.makeJQueryPlugin();
-
-// --------------------------  -------------------------- //
-
-return ImagesLoaded;
-
-});
-
-},{"ev-emitter":"../node_modules/ev-emitter/ev-emitter.js"}],"js/utils.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.preloadImages = void 0;
-const imagesLoaded = require('imagesloaded');
-
-// Preload images
-const preloadImages = function () {
-  let selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'img';
-  return new Promise(resolve => {
-    imagesLoaded(document.querySelectorAll(selector), {
-      background: true
-    }, resolve);
-  });
-};
-exports.preloadImages = preloadImages;
-},{"imagesloaded":"../node_modules/imagesloaded/imagesloaded.js"}],"../node_modules/gsap/gsap-core.js":[function(require,module,exports) {
+})({"../node_modules/gsap/gsap-core.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6007,174 +5492,253 @@ var _CSSPlugin = require("./CSSPlugin.js");
 var gsapWithCSS = exports.default = exports.gsap = _gsapCore.gsap.registerPlugin(_CSSPlugin.CSSPlugin) || _gsapCore.gsap,
   // to protect from tree shaking
   TweenMaxWithCSS = exports.TweenMax = gsapWithCSS.core.Tween;
-},{"./gsap-core.js":"../node_modules/gsap/gsap-core.js","./CSSPlugin.js":"../node_modules/gsap/CSSPlugin.js"}],"js/index.js":[function(require,module,exports) {
+},{"./gsap-core.js":"../node_modules/gsap/gsap-core.js","./CSSPlugin.js":"../node_modules/gsap/CSSPlugin.js"}],"js/cursor.js":[function(require,module,exports) {
 "use strict";
 
-var _utils = require("./utils");
 var _gsap = require("gsap");
-// preload images then remove loader (loading class) 
-(0, _utils.preloadImages)('.tiles__line-img').then(() => document.body.classList.remove('loading'));
+/**
+ * Linear interpolation
+ * @param {Number} a - first value to interpolate
+ * @param {Number} b - second value to interpolate 
+ * @param {Number} n - amount to interpolate
+ */
+const lerp = (a, b, n) => (1 - n) * a + n * b;
 
-// frame element
-const frame = document.querySelector('.frame');
-
-// overlay (SVG path element)
-const overlayPath = document.querySelector('.overlay__path');
-
-// menu (wrap) element
-const menuWrap = document.querySelector('.menu-wrap');
-
-// menu items
-const menuItems = menuWrap.querySelectorAll('.menu__item');
-
-// open menu button
-const openMenuCtrl = document.querySelector('button.button-menu');
-
-// close menu button
-const closeMenuCtrl = menuWrap.querySelector('.button-close');
-
-// big title elements
-const title = {
-  main: document.querySelector('.content__title-main'),
-  sub: document.querySelector('.content__title-sub')
-};
-let isAnimating = false;
-
-// opens the menu
-const openMenu = () => {
-  if (isAnimating) return;
-  isAnimating = true;
-  _gsap.gsap.timeline({
-    onComplete: () => isAnimating = false
-  }).set(overlayPath, {
-    attr: {
-      d: 'M 0 100 V 100 Q 50 100 100 100 V 100 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.8,
-    ease: 'power4.in',
-    attr: {
-      d: 'M 0 100 V 50 Q 50 0 100 50 V 100 z'
-    }
-  }, 0).to(overlayPath, {
-    duration: 0.3,
-    ease: 'power2',
-    attr: {
-      d: 'M 0 100 V 0 Q 50 0 100 0 V 100 z'
-    },
-    onComplete: () => {
-      frame.classList.add('frame--menu-open');
-      menuWrap.classList.add('menu-wrap--open');
-    }
-  })
-  // title elements
-  .to([title.main, title.sub], {
-    duration: 0.8,
-    ease: 'power3.in',
-    y: -200,
-    stagger: 0.05
-  }, 0.2)
-
-  // now reveal
-  .set(menuItems, {
-    opacity: 0
-  }).set(overlayPath, {
-    attr: {
-      d: 'M 0 0 V 100 Q 50 100 100 100 V 0 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.3,
-    ease: 'power2.in',
-    attr: {
-      d: 'M 0 0 V 50 Q 50 0 100 50 V 0 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.8,
-    ease: 'power4',
-    attr: {
-      d: 'M 0 0 V 0 Q 50 0 100 0 V 0 z'
-    }
-  })
-  // menu items translate animation
-  .to(menuItems, {
-    duration: 1.1,
-    ease: 'power4',
-    startAt: {
-      y: 150
-    },
-    y: 0,
-    opacity: 1,
-    stagger: 0.05
-  }, '>-=1.1');
+/**
+ * Gets the cursor position
+ * @param {Event} ev - mousemove event
+ */
+const getCursorPos = ev => {
+  return {
+    x: ev.clientX,
+    y: ev.clientY
+  };
 };
 
-// closes the menu
-const closeMenu = () => {
-  if (isAnimating) return;
-  isAnimating = true;
-  _gsap.gsap.timeline({
-    onComplete: () => isAnimating = false
-  }).set(overlayPath, {
-    attr: {
-      d: 'M 0 0 V 0 Q 50 0 100 0 V 0 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.8,
-    ease: 'power4.in',
-    attr: {
-      d: 'M 0 0 V 50 Q 50 100 100 50 V 0 z'
-    }
-  }, 0).to(overlayPath, {
-    duration: 0.3,
-    ease: 'power2',
-    attr: {
-      d: 'M 0 0 V 100 Q 50 100 100 100 V 0 z'
-    },
-    onComplete: () => {
-      frame.classList.remove('frame--menu-open');
-      menuWrap.classList.remove('menu-wrap--open');
-    }
-  })
-  // now reveal
-  .set(overlayPath, {
-    attr: {
-      d: 'M 0 100 V 0 Q 50 0 100 0 V 100 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.3,
-    ease: 'power2.in',
-    attr: {
-      d: 'M 0 100 V 50 Q 50 100 100 50 V 100 z'
-    }
-  }).to(overlayPath, {
-    duration: 0.8,
-    ease: 'power4',
-    attr: {
-      d: 'M 0 100 V 100 Q 50 100 100 100 V 100 z'
-    }
-  })
-  // title elements
-  .to([title.main, title.sub], {
-    duration: 1.1,
-    ease: 'power4',
-    y: 0,
-    stagger: -0.05
-  }, '>-=1.1')
-  // menu items translate animation
-  .to(menuItems, {
-    duration: 0.8,
-    ease: 'power2.in',
-    y: 100,
-    opacity: 0,
-    stagger: -0.05
-  }, 0);
+// Track the cursor position
+let cursor = {
+  x: 0,
+  y: 0
 };
+window.addEventListener('mousemove', ev => cursor = getCursorPos(ev));
 
-// click on menu button
-openMenuCtrl.addEventListener('click', openMenu);
-// click on close menu button
-closeMenuCtrl.addEventListener('click', closeMenu);
-},{"./utils":"js/utils.js","gsap":"../node_modules/gsap/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+/**
+ * Class representing a custom cursor.
+ * A Cursor can have multiple elements/svgs
+ */
+class Cursor {
+  // DOM elements
+  DOM = {
+    // cursor elements (SVGs .cursor)
+    elements: null
+  };
+  // All CursorElement instances
+  cursorElements = [];
+
+  /**
+   * Constructor.
+   * @param {NodeList} Dom_elems - all .cursor elements
+   * @param {String} triggerSelector - Trigger the cursor enter/leave method on the this selector returned elements. Default is all <a>.
+   */
+  constructor(Dom_elems) {
+    let triggerSelector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'a, .cursor-effect';
+    this.DOM.elements = Dom_elems;
+    [...this.DOM.elements].forEach(el => this.cursorElements.push(new CursorElement(el)));
+    [...document.querySelectorAll(triggerSelector)].forEach(link => {
+      link.addEventListener('mouseenter', () => this.enter());
+      link.addEventListener('mouseleave', () => this.leave());
+    });
+  }
+  /**
+   * Mouseenter event
+   */
+  enter() {
+    for (const el of this.cursorElements) {
+      el.enter();
+    }
+  }
+
+  /**
+   * Mouseleave event
+   */
+  leave() {
+    for (const el of this.cursorElements) {
+      el.leave();
+    }
+  }
+}
+
+/**
+ * Class representing a .cursor element
+ */
+class CursorElement {
+  // DOM elements
+  DOM = {
+    // Main element (.cursor)
+    el: null,
+    // Inner element (.cursor__inner)
+    inner: null,
+    // feTurbulence element
+    feTurbulence: null
+  };
+  // Scales value when entering an <a> element
+  radiusOnEnter = 40;
+  // Opacity value when entering an <a> element
+  opacityOnEnter = 1;
+  // radius
+  radius;
+  // Element style properties
+  renderedStyles = {
+    // With interpolation, we can achieve a smooth animation effect when moving the cursor. 
+    // The "previous" and "current" values are the values that will interpolate. 
+    // The returned value will be one between these two (previous and current) at a specific increment. 
+    // The "amt" is the amount to interpolate. 
+    // As an example, the following formula calculates the x-axis translation value to apply to the cursor element:
+    // this.renderedStyles.tx.previous = lerp(this.renderedStyles.tx.previous, this.renderedStyles.tx.current, this.renderedStyles.tx.amt);
+
+    // translation, scale and opacity values
+    // The lower the amt, the slower the cursor "follows" the user gesture
+    tx: {
+      previous: 0,
+      current: 0,
+      amt: 0.15
+    },
+    ty: {
+      previous: 0,
+      current: 0,
+      amt: 0.15
+    },
+    // The scale and opacity will change when hovering over any element specified in [triggerSelector]
+    // Defaults are 1 for both properties
+    //scale: {previous: 1, current: 1, amt: 0.2},
+    radius: {
+      previous: 20,
+      current: 20,
+      amt: 0.15
+    },
+    opacity: {
+      previous: 1,
+      current: 1,
+      amt: 0.15
+    }
+  };
+  // Element size and position
+  bounds;
+  // SVG filter id
+  filterId = '#cursor-filter';
+  // for the filter animation
+  primitiveValues = {
+    turbulence: 0
+  };
+
+  /**
+   * Constructor.
+   */
+  constructor(DOM_el) {
+    this.DOM.el = DOM_el;
+    this.DOM.inner = this.DOM.el.querySelector('.cursor__inner');
+    this.DOM.feTurbulence = document.querySelector(`${this.filterId} > feTurbulence`);
+    this.createFilterTimeline();
+
+    // Hide it initially
+    this.opacity = this.DOM.el.style.opacity;
+    this.DOM.el.style.opacity = 0;
+
+    // Calculate size and position
+    this.bounds = this.DOM.el.getBoundingClientRect();
+
+    // Check if any options passed in data attributes
+    this.radiusOnEnter = this.DOM.el.dataset.radiusEnter || this.radiusOnEnter;
+    this.opacityOnEnter = this.DOM.el.dataset.opacityEnter || this.opacityOnEnter;
+    for (const key in this.renderedStyles) {
+      this.renderedStyles[key].amt = this.DOM.el.dataset.amt || this.renderedStyles[key].amt;
+    }
+    this.radius = this.DOM.inner.getAttribute('r');
+    this.renderedStyles['radius'].previous = this.renderedStyles['radius'].current = this.radius;
+    this.renderedStyles['opacity'].previous = this.renderedStyles['opacity'].current = this.opacity;
+
+    // Show the element and start tracking its position as soon as the user moves the cursor.
+    const onMouseMoveEv = () => {
+      // Set up the initial values to be the same
+      this.renderedStyles.tx.previous = this.renderedStyles.tx.current = cursor.x - this.bounds.width / 2;
+      this.renderedStyles.ty.previous = this.renderedStyles.ty.previous = cursor.y - this.bounds.height / 2;
+      // Show it
+      this.DOM.el.style.opacity = this.opacity;
+      // Start rAF loop
+      requestAnimationFrame(() => this.render());
+      // Remove the initial mousemove event
+      window.removeEventListener('mousemove', onMouseMoveEv);
+    };
+    window.addEventListener('mousemove', onMouseMoveEv);
+  }
+
+  /**
+   * Mouseenter event
+   * Scale up and fade out.
+   */
+  enter() {
+    this.renderedStyles['radius'].current = this.radiusOnEnter;
+    this.renderedStyles['opacity'].current = this.opacityOnEnter;
+    this.filterTimeline.restart();
+  }
+
+  /**
+   * Mouseleave event
+   * Reset scale and opacity.
+   */
+  leave() {
+    this.renderedStyles['radius'].current = this.radius;
+    this.renderedStyles['opacity'].current = this.opacity;
+    this.filterTimeline.progress(1).kill();
+  }
+  createFilterTimeline() {
+    this.filterTimeline = _gsap.gsap.timeline({
+      paused: true,
+      onStart: () => {
+        this.DOM.inner.style.filter = `url(${this.filterId}`;
+      },
+      onUpdate: () => {
+        this.DOM.feTurbulence.setAttribute('baseFrequency', this.primitiveValues.turbulence);
+      },
+      onComplete: () => {
+        this.DOM.inner.style.filter = 'none';
+      }
+    }).to(this.primitiveValues, {
+      duration: .5,
+      ease: 'sine.in',
+      startAt: {
+        turbulence: 1
+      },
+      turbulence: 0
+    });
+  }
+
+  /**
+   * Loop / Interpolation
+   */
+  render() {
+    // New cursor positions
+    this.renderedStyles['tx'].current = cursor.x - this.bounds.width / 2;
+    this.renderedStyles['ty'].current = cursor.y - this.bounds.height / 2;
+
+    // Interpolation
+    for (const key in this.renderedStyles) {
+      this.renderedStyles[key].previous = lerp(this.renderedStyles[key].previous, this.renderedStyles[key].current, this.renderedStyles[key].amt);
+    }
+
+    // Apply interpolated values (smooth effect)
+    this.DOM.el.style.transform = `translateX(${this.renderedStyles['tx'].previous}px) translateY(${this.renderedStyles['ty'].previous}px)`;
+    this.DOM.inner.setAttribute('r', this.renderedStyles['radius'].previous);
+    this.DOM.el.style.opacity = this.renderedStyles['opacity'].previous;
+
+    // loop...
+    requestAnimationFrame(() => this.render());
+  }
+}
+
+// Initialize custom cursor
+const customCursor = new Cursor(document.querySelectorAll('.cursor'));
+},{"gsap":"../node_modules/gsap/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -6343,5 +5907,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/index.js"], null)
-//# sourceMappingURL=/js.00a46daa.js.map
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/cursor.js"], null)
+//# sourceMappingURL=/cursor.f70347af.js.map
