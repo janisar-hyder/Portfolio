@@ -320,12 +320,14 @@ main {
 	width: calc(16.6666% - var(--tile-margin) * 2);
 	height: calc( var(--tileswrap-height) / 3 - (3 * var(--tile-margin) / 2));
 	margin: var(--tile-margin);
-	background-size: contain;
+	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
 	opacity: 90%;
 }
-
+.haha{
+	background-size: contain;
+}
 .tiles--perspective .tiles__line-img {
 	backface-visibility: hidden;
 	outline: 1px solid transparent;
